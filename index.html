@@ -89,9 +89,16 @@
     .btn-si:hover { transform: scale(1.04); box-shadow: 0 6px 36px #7a9e7e88; }
     .btn-si:active { transform: scale(0.97); }
 
-    /* NO button — fixed, roams freely */
+    .btn-container {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 28px;
+    }
+
+    /* NO button — starts inline, escapes on hover */
     #btnNo {
-      position: fixed;
       padding: 18px 52px;
       font-size: clamp(1.1rem, 3.5vw, 1.8rem);
       font-weight: 700;
@@ -100,13 +107,14 @@
       border: none;
       border-radius: 60px;
       cursor: pointer;
-      opacity: 0;
-      z-index: 200;
-      pointer-events: none;
       user-select: none;
       -webkit-user-select: none;
       box-shadow: 0 4px 20px #c4614a44;
-      transition: box-shadow 0.2s;
+    }
+
+    #btnNo.escaped {
+      position: fixed;
+      z-index: 200;
     }
 
     /* YES overlay */
@@ -176,7 +184,7 @@
 
   <!-- Slide 4 -->
   <div class="slide">
-    <p class="msg small" id="m4" style="color:#2c1f0e">Pero se me apareció el gusanito<br>de mandarte esto</p>
+    <p class="msg small" id="m4" style="color:#2c1f0e">Y bueno... me agarró el impulso<br>de escribirte</p>
   </div>
 
   <!-- Slide 5 -->
@@ -189,12 +197,12 @@
     <div class="cta-card" id="ctaCard">
       <p class="date-text">Este viernes 30 de mayo<br>a las 18hs</p>
       <p class="note">(la fecha la podemos mover, no drama)</p>
-      <button class="btn-si" onclick="handleSi()">Sí ✅</button>
+      <div class="btn-container">
+        <button class="btn-si" onclick="handleSi()">Sí ✅</button>
+        <button id="btnNo">No ❌</button>
+      </div>
     </div>
   </div>
-
-  <!-- NO button (roaming, fixed) -->
-  <button id="btnNo">No ❌</button>
 
   <!-- YES overlay -->
   <div id="overlay">
@@ -236,8 +244,7 @@
           opacity: [0, 1],
           translateY: [50, 0],
           duration: 750,
-          easing: 'easeOutExpo',
-          complete: showNo
+          easing: 'easeOutExpo'
         });
         ctaObserver.unobserve(entry.target);
       });
@@ -261,23 +268,23 @@
 
     // ── NO button ──────────────────────────────────────────────────
     const btnNo = document.getElementById('btnNo');
-    let noVisible = false;
+    let escaped = false;
 
-    function showNo() {
-      if (noVisible) return;
-      noVisible = true;
-
-      // Initial position: bottom-right area of viewport
-      btnNo.style.left  = Math.min(window.innerWidth  * 0.58, window.innerWidth  - 200) + 'px';
-      btnNo.style.top   = Math.min(window.innerHeight * 0.72, window.innerHeight - 80)  + 'px';
-      btnNo.style.pointerEvents = 'all';
-
-      anime({
-        targets: btnNo,
-        opacity: [0, 1],
-        duration: 500,
-        easing: 'easeOutExpo'
-      });
+    function escapeNo(e) {
+      e.preventDefault();
+      if (!escaped) {
+        // Freeze current position then switch to fixed
+        const rect = btnNo.getBoundingClientRect();
+        btnNo.classList.add('escaped');
+        btnNo.style.left  = rect.left + 'px';
+        btnNo.style.top   = rect.top  + 'px';
+        btnNo.style.width = rect.width + 'px';
+        escaped = true;
+        // Small pause so it feels like it "noticed" the cursor
+        setTimeout(moveNo, 80);
+      } else {
+        moveNo();
+      }
     }
 
     function moveNo() {
@@ -294,18 +301,13 @@
         targets: btnNo,
         left: x + 'px',
         top:  y + 'px',
-        duration: 180,
+        duration: 200,
         easing: 'easeOutQuad'
       });
     }
 
-    btnNo.addEventListener('mouseover', moveNo);
-
-    // On touch devices: escape before the finger lands
-    btnNo.addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      moveNo();
-    }, { passive: false });
+    btnNo.addEventListener('mouseover', escapeNo);
+    btnNo.addEventListener('touchstart', escapeNo, { passive: false });
 
     // ── YES handler ────────────────────────────────────────────────
     function handleSi() {
