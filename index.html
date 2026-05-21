@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hola 👋</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: #0a0a0f;
+      color: #fff;
+      font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+      overflow-x: hidden;
+    }
+
+    .slide {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 24px;
+      text-align: center;
+      position: relative;
+    }
+
+    .msg {
+      font-size: clamp(2.5rem, 10vw, 6rem);
+      font-weight: 800;
+      line-height: 1.2;
+      opacity: 0;
+      will-change: transform, opacity;
+    }
+
+    .msg.medium { font-size: clamp(1.8rem, 6vw, 4rem); }
+    .msg.small  { font-size: clamp(1.4rem, 4.5vw, 2.8rem); font-weight: 600; }
+
+    /* Scroll hint on first slide */
+    .scroll-hint {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1rem;
+      color: #444;
+      opacity: 0;
+      letter-spacing: 0.05em;
+    }
+
+    /* CTA card */
+    .cta-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      opacity: 0;
+      will-change: transform, opacity;
+    }
+
+    .date-text {
+      font-size: clamp(2rem, 6vw, 3.5rem);
+      font-weight: 700;
+      line-height: 1.3;
+    }
+
+    .note {
+      font-size: clamp(0.85rem, 2.5vw, 1.1rem);
+      color: #555;
+      font-style: italic;
+    }
+
+    .btn-si {
+      margin-top: 28px;
+      padding: 18px 64px;
+      font-size: clamp(1.2rem, 4vw, 2rem);
+      font-weight: 700;
+      background: #22c55e;
+      color: #000;
+      border: none;
+      border-radius: 60px;
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.1s;
+      box-shadow: 0 0 30px #22c55e55;
+    }
+
+    .btn-si:hover { transform: scale(1.04); box-shadow: 0 0 50px #22c55e88; }
+    .btn-si:active { transform: scale(0.97); }
+
+    /* NO button — fixed, roams freely */
+    #btnNo {
+      position: fixed;
+      padding: 18px 52px;
+      font-size: clamp(1.1rem, 3.5vw, 1.8rem);
+      font-weight: 700;
+      background: #ef4444;
+      color: #fff;
+      border: none;
+      border-radius: 60px;
+      cursor: pointer;
+      opacity: 0;
+      z-index: 200;
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-select: none;
+      box-shadow: 0 0 24px #ef444455;
+      transition: box-shadow 0.2s;
+    }
+
+    /* YES overlay */
+    #overlay {
+      position: fixed;
+      inset: 0;
+      background: #0a0a0f;
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 40px 24px;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #overlay.visible { pointer-events: all; }
+
+    #overlay .emoji-big { font-size: clamp(3rem, 12vw, 6rem); margin-bottom: 20px; }
+
+    #overlay h2 {
+      font-size: clamp(1.8rem, 6vw, 3.5rem);
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    #overlay .sub {
+      font-size: clamp(1rem, 3vw, 1.4rem);
+      color: #666;
+      margin-bottom: 44px;
+    }
+
+    .contact-link {
+      font-size: clamp(1.1rem, 3.5vw, 1.8rem);
+      font-weight: 600;
+      text-decoration: none;
+      margin: 10px 0;
+      display: block;
+      transition: opacity 0.2s;
+    }
+
+    .contact-link:hover { opacity: 0.8; }
+    .contact-link.phone { color: #4ade80; }
+    .contact-link.ig    { color: #c084fc; }
+  </style>
+</head>
+<body>
+
+  <!-- Slide 1 -->
+  <div class="slide">
+    <p class="msg" id="m1" style="color:#ffffff">Hola 👋</p>
+    <p class="scroll-hint" id="hint">scrolleá ↓</p>
+  </div>
+
+  <!-- Slide 2 -->
+  <div class="slide">
+    <p class="msg medium" id="m2" style="color:#9ca3af">Ya sé que es raro...</p>
+  </div>
+
+  <!-- Slide 3 -->
+  <div class="slide">
+    <p class="msg medium" id="m3" style="color:#facc15">No hablamos hace como<br>3 años 💀</p>
+  </div>
+
+  <!-- Slide 4 -->
+  <div class="slide">
+    <p class="msg small" id="m4" style="color:#f472b6">Pero se me apareció el gusanito<br>de mandarte esto</p>
+  </div>
+
+  <!-- Slide 5 -->
+  <div class="slide">
+    <p class="msg" id="m5" style="color:#38bdf8">¿Salís a merendar<br>conmigo? ☕</p>
+  </div>
+
+  <!-- Slide 6 — CTA -->
+  <div class="slide" id="ctaSlide">
+    <div class="cta-card" id="ctaCard">
+      <p class="date-text">Este viernes 30 de mayo<br>a las 18hs</p>
+      <p class="note">(la fecha la podemos mover, no drama)</p>
+      <button class="btn-si" onclick="handleSi()">Sí ✅</button>
+    </div>
+  </div>
+
+  <!-- NO button (roaming, fixed) -->
+  <button id="btnNo">No ❌</button>
+
+  <!-- YES overlay -->
+  <div id="overlay">
+    <div class="emoji-big">🎉</div>
+    <h2>¡Sabía que ibas a decir que sí!</h2>
+    <p class="sub">Ya sabés dónde encontrarme</p>
+    <a class="contact-link phone" href="tel:+541123782608">📱 11 2378-2608</a>
+    <a class="contact-link ig" href="https://www.instagram.com/joelp_____/" target="_blank">📸 @joelp_____</a>
+  </div>
+
+  <script>
+    // ── Scroll reveal ──────────────────────────────────────────────
+    const revealIds = ['m1', 'm2', 'm3', 'm4', 'm5'];
+
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        anime({
+          targets: entry.target,
+          opacity: [0, 1],
+          translateY: [50, 0],
+          duration: 750,
+          easing: 'easeOutExpo'
+        });
+        // show scroll hint after first message
+        if (entry.target.id === 'm1') showHint();
+        revealObserver.unobserve(entry.target);
+      });
+    }, { threshold: 0.35 });
+
+    revealIds.forEach(id => revealObserver.observe(document.getElementById(id)));
+
+    // CTA card
+    const ctaObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        anime({
+          targets: '#ctaCard',
+          opacity: [0, 1],
+          translateY: [50, 0],
+          duration: 750,
+          easing: 'easeOutExpo',
+          complete: showNo
+        });
+        ctaObserver.unobserve(entry.target);
+      });
+    }, { threshold: 0.35 });
+
+    ctaObserver.observe(document.getElementById('ctaSlide'));
+
+    // ── Scroll hint ────────────────────────────────────────────────
+    function showHint() {
+      const hint = document.getElementById('hint');
+      anime({
+        targets: hint,
+        opacity: [0, 0.5],
+        translateY: [0, 8, 0],
+        duration: 1800,
+        loop: true,
+        easing: 'easeInOutSine',
+        delay: 800
+      });
+    }
+
+    // ── NO button ──────────────────────────────────────────────────
+    const btnNo = document.getElementById('btnNo');
+    let noVisible = false;
+
+    function showNo() {
+      if (noVisible) return;
+      noVisible = true;
+
+      // Initial position: bottom-right area of viewport
+      btnNo.style.left  = Math.min(window.innerWidth  * 0.58, window.innerWidth  - 200) + 'px';
+      btnNo.style.top   = Math.min(window.innerHeight * 0.72, window.innerHeight - 80)  + 'px';
+      btnNo.style.pointerEvents = 'all';
+
+      anime({
+        targets: btnNo,
+        opacity: [0, 1],
+        duration: 500,
+        easing: 'easeOutExpo'
+      });
+    }
+
+    function moveNo() {
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const bw = btnNo.offsetWidth  || 160;
+      const bh = btnNo.offsetHeight || 60;
+      const margin = 24;
+
+      const x = margin + Math.random() * (vw - bw - margin * 2);
+      const y = margin + Math.random() * (vh - bh - margin * 2);
+
+      anime({
+        targets: btnNo,
+        left: x + 'px',
+        top:  y + 'px',
+        duration: 180,
+        easing: 'easeOutQuad'
+      });
+    }
+
+    btnNo.addEventListener('mouseover', moveNo);
+
+    // On touch devices: escape before the finger lands
+    btnNo.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      moveNo();
+    }, { passive: false });
+
+    // ── YES handler ────────────────────────────────────────────────
+    function handleSi() {
+      const overlay = document.getElementById('overlay');
+      overlay.classList.add('visible');
+      anime({
+        targets: overlay,
+        opacity: [0, 1],
+        duration: 800,
+        easing: 'easeOutExpo'
+      });
+    }
+  </script>
+</body>
+</html>
