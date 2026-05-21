@@ -11,8 +11,8 @@
     html { scroll-behavior: smooth; }
 
     body {
-      background: #0a0a0f;
-      color: #fff;
+      background: #faf6f0;
+      color: #2c1f0e;
       font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
       overflow-x: hidden;
     }
@@ -45,7 +45,7 @@
       left: 50%;
       transform: translateX(-50%);
       font-size: 1rem;
-      color: #444;
+      color: #b8a898;
       opacity: 0;
       letter-spacing: 0.05em;
     }
@@ -68,7 +68,7 @@
 
     .note {
       font-size: clamp(0.85rem, 2.5vw, 1.1rem);
-      color: #555;
+      color: #a89880;
       font-style: italic;
     }
 
@@ -77,16 +77,16 @@
       padding: 18px 64px;
       font-size: clamp(1.2rem, 4vw, 2rem);
       font-weight: 700;
-      background: #22c55e;
-      color: #000;
+      background: #7a9e7e;
+      color: #fff;
       border: none;
       border-radius: 60px;
       cursor: pointer;
       transition: transform 0.1s, box-shadow 0.1s;
-      box-shadow: 0 0 30px #22c55e55;
+      box-shadow: 0 4px 24px #7a9e7e55;
     }
 
-    .btn-si:hover { transform: scale(1.04); box-shadow: 0 0 50px #22c55e88; }
+    .btn-si:hover { transform: scale(1.04); box-shadow: 0 6px 36px #7a9e7e88; }
     .btn-si:active { transform: scale(0.97); }
 
     /* NO button — fixed, roams freely */
@@ -95,7 +95,7 @@
       padding: 18px 52px;
       font-size: clamp(1.1rem, 3.5vw, 1.8rem);
       font-weight: 700;
-      background: #ef4444;
+      background: #c4614a;
       color: #fff;
       border: none;
       border-radius: 60px;
@@ -105,7 +105,7 @@
       pointer-events: none;
       user-select: none;
       -webkit-user-select: none;
-      box-shadow: 0 0 24px #ef444455;
+      box-shadow: 0 4px 20px #c4614a44;
       transition: box-shadow 0.2s;
     }
 
@@ -113,7 +113,7 @@
     #overlay {
       position: fixed;
       inset: 0;
-      background: #0a0a0f;
+      background: #faf6f0;
       z-index: 999;
       display: flex;
       flex-direction: column;
@@ -133,11 +133,12 @@
       font-size: clamp(1.8rem, 6vw, 3.5rem);
       font-weight: 800;
       margin-bottom: 12px;
+      color: #2c1f0e;
     }
 
     #overlay .sub {
       font-size: clamp(1rem, 3vw, 1.4rem);
-      color: #666;
+      color: #a89880;
       margin-bottom: 44px;
     }
 
@@ -150,37 +151,37 @@
       transition: opacity 0.2s;
     }
 
-    .contact-link:hover { opacity: 0.8; }
-    .contact-link.phone { color: #4ade80; }
-    .contact-link.ig    { color: #c084fc; }
+    .contact-link:hover { opacity: 0.75; }
+    .contact-link.phone { color: #7a9e7e; }
+    .contact-link.ig    { color: #9a7aaa; }
   </style>
 </head>
 <body>
 
   <!-- Slide 1 -->
   <div class="slide">
-    <p class="msg" id="m1" style="color:#ffffff">Hola 👋</p>
+    <p class="msg" id="m1" style="color:#2c1f0e">Hola 👋</p>
     <p class="scroll-hint" id="hint">scrolleá ↓</p>
   </div>
 
   <!-- Slide 2 -->
   <div class="slide">
-    <p class="msg medium" id="m2" style="color:#9ca3af">Ya sé que es raro...</p>
+    <p class="msg medium" id="m2" style="color:#a89880">Ya sé que es raro...</p>
   </div>
 
   <!-- Slide 3 -->
   <div class="slide">
-    <p class="msg medium" id="m3" style="color:#facc15">No hablamos hace como<br>3 años 💀</p>
+    <p class="msg medium" id="m3" style="color:#c4903a">No hablamos hace como<br>3 años 💀</p>
   </div>
 
   <!-- Slide 4 -->
   <div class="slide">
-    <p class="msg small" id="m4" style="color:#f472b6">Pero se me apareció el gusanito<br>de mandarte esto</p>
+    <p class="msg small" id="m4" style="color:#b56a5a">Pero se me apareció el gusanito<br>de mandarte esto</p>
   </div>
 
   <!-- Slide 5 -->
   <div class="slide">
-    <p class="msg" id="m5" style="color:#38bdf8">¿Salís a merendar<br>conmigo? ☕</p>
+    <p class="msg" id="m5" style="color:#6a8a7a">¿Salís a merendar<br>conmigo? ☕</p>
   </div>
 
   <!-- Slide 6 — CTA -->
