@@ -99,8 +99,8 @@
 
     /* NO button — starts inline, escapes on hover */
     #btnNo {
-      padding: 18px 52px;
-      font-size: clamp(1.1rem, 3.5vw, 1.8rem);
+      padding: 18px 64px;
+      font-size: clamp(1.2rem, 4vw, 2rem);
       font-weight: 700;
       background: #c4614a;
       color: #fff;
@@ -184,7 +184,7 @@
 
   <!-- Slide 4 -->
   <div class="slide">
-    <p class="msg small" id="m4" style="color:#2c1f0e">Y bueno... me agarró el impulso<br>de escribirte</p>
+    <p class="msg medium" id="m4" style="color:#2c1f0e">Y bueno... me agarró el impulso<br>de escribirte</p>
   </div>
 
   <!-- Slide 5 -->
@@ -290,12 +290,15 @@
     function moveNo() {
       const vw = window.innerWidth;
       const vh = window.innerHeight;
-      const bw = btnNo.offsetWidth  || 160;
-      const bh = btnNo.offsetHeight || 60;
+      const rect = btnNo.getBoundingClientRect();
+      const bw = rect.width  || 160;
+      const bh = rect.height || 60;
       const margin = 24;
 
-      const x = margin + Math.random() * (vw - bw - margin * 2);
-      const y = margin + Math.random() * (vh - bh - margin * 2);
+      const maxX = vw - bw - margin;
+      const maxY = vh - bh - margin;
+      const x = Math.max(margin, Math.min(maxX, margin + Math.random() * (maxX - margin)));
+      const y = Math.max(margin, Math.min(maxY, margin + Math.random() * (maxY - margin)));
 
       anime({
         targets: btnNo,
