@@ -73,7 +73,6 @@
     }
 
     .btn-si {
-      margin-top: 28px;
       padding: 18px 64px;
       font-size: clamp(1.2rem, 4vw, 2rem);
       font-weight: 700;
@@ -269,18 +268,19 @@
     // ── NO button ──────────────────────────────────────────────────
     const btnNo = document.getElementById('btnNo');
     let escaped = false;
+    let btnW = 0, btnH = 0;
 
     function escapeNo(e) {
       e.preventDefault();
       if (!escaped) {
-        // Freeze current position then switch to fixed
         const rect = btnNo.getBoundingClientRect();
+        btnW = rect.width;
+        btnH = rect.height;
         btnNo.classList.add('escaped');
         btnNo.style.left  = rect.left + 'px';
         btnNo.style.top   = rect.top  + 'px';
-        btnNo.style.width = rect.width + 'px';
+        btnNo.style.width = btnW + 'px';
         escaped = true;
-        // Small pause so it feels like it "noticed" the cursor
         setTimeout(moveNo, 80);
       } else {
         moveNo();
@@ -290,15 +290,12 @@
     function moveNo() {
       const vw = window.innerWidth;
       const vh = window.innerHeight;
-      const rect = btnNo.getBoundingClientRect();
-      const bw = rect.width  || 160;
-      const bh = rect.height || 60;
+      const bw = btnW || btnNo.offsetWidth || 180;
+      const bh = btnH || btnNo.offsetHeight || 60;
       const margin = 24;
 
-      const maxX = vw - bw - margin;
-      const maxY = vh - bh - margin;
-      const x = Math.max(margin, Math.min(maxX, margin + Math.random() * (maxX - margin)));
-      const y = Math.max(margin, Math.min(maxY, margin + Math.random() * (maxY - margin)));
+      const x = margin + Math.random() * Math.max(0, vw - bw - margin * 2);
+      const y = margin + Math.random() * Math.max(0, vh - bh - margin * 2);
 
       anime({
         targets: btnNo,
