@@ -92,8 +92,8 @@
     /* NO button — fixed, roams freely */
     #btnNo {
       position: fixed;
-      padding: 18px 52px;
-      font-size: clamp(1.1rem, 3.5vw, 1.8rem);
+      padding: 18px 64px;
+      font-size: clamp(1.2rem, 4vw, 2rem);
       font-weight: 700;
       background: #ef4444;
       color: #fff;
@@ -175,7 +175,7 @@
 
   <!-- Slide 4 -->
   <div class="slide">
-    <p class="msg small" id="m4" style="color:#f472b6">Pero se me apareció el gusanito<br>de mandarte esto</p>
+    <p class="msg medium" id="m4" style="color:#f472b6">Pero se me apareció el gusanito<br>de mandarte esto</p>
   </div>
 
   <!-- Slide 5 -->
@@ -282,12 +282,15 @@
     function moveNo() {
       const vw = window.innerWidth;
       const vh = window.innerHeight;
-      const bw = btnNo.offsetWidth  || 160;
-      const bh = btnNo.offsetHeight || 60;
+      const rect = btnNo.getBoundingClientRect();
+      const bw = rect.width  || 160;
+      const bh = rect.height || 60;
       const margin = 24;
 
-      const x = margin + Math.random() * (vw - bw - margin * 2);
-      const y = margin + Math.random() * (vh - bh - margin * 2);
+      const maxX = vw - bw - margin;
+      const maxY = vh - bh - margin;
+      const x = Math.max(margin, Math.min(maxX, margin + Math.random() * (maxX - margin)));
+      const y = Math.max(margin, Math.min(maxY, margin + Math.random() * (maxY - margin)));
 
       anime({
         targets: btnNo,
