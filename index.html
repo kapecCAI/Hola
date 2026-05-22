@@ -96,7 +96,7 @@
       margin-top: 28px;
     }
 
-    /* Zone where NO roams — browser enforces containment */
+    /* Zone where NO roams after first hover */
     #no-zone {
       position: fixed;
       inset: 20px;
@@ -105,7 +105,6 @@
     }
 
     #btnNo {
-      position: absolute;
       padding: 18px 64px;
       font-size: clamp(1.2rem, 4vw, 2rem);
       font-weight: 700;
@@ -114,11 +113,14 @@
       border: none;
       border-radius: 60px;
       cursor: pointer;
-      opacity: 0;
-      pointer-events: none;
       user-select: none;
       -webkit-user-select: none;
       box-shadow: 0 4px 20px #c4614a44;
+    }
+
+    #btnNo.escaped {
+      position: absolute;
+      pointer-events: all;
     }
 
     /* YES overlay */
@@ -202,13 +204,12 @@
       <p class="date-text">Este viernes 30 de mayo<br>a las 18hs</p>
       <p class="note">(la fecha la podemos mover, no drama)</p>
       <button class="btn-si" onclick="handleSi()">Sí ✅</button>
+        <button id="btnNo">No ❌</button>
     </div>
   </div>
 
-  <!-- NO zone — button roams inside here, can't escape -->
-  <div id="no-zone">
-    <button id="btnNo">No ❌</button>
-  </div>
+  <!-- NO zone — button moves here on first hover -->
+  <div id="no-zone"></div>
 
   <!-- YES overlay -->
   <div id="overlay">
@@ -250,8 +251,7 @@
           opacity: [0, 1],
           translateY: [50, 0],
           duration: 750,
-          easing: 'easeOutExpo',
-          complete: showNo
+          easing: 'easeOutExpo'
         });
         ctaObserver.unobserve(entry.target);
       });
@@ -273,40 +273,36 @@
       });
     }
 
-    // ── NO button — lives inside #no-zone, can never escape it ─────
+    // ── NO button ──────────────────────────────────────────────────
     const btnNo  = document.getElementById('btnNo');
     const noZone = document.getElementById('no-zone');
-    const BTN_W  = 250;
-    const BTN_H  = 72;
-
-    function showNo() {
-      const siBtn = document.querySelector('.btn-si');
-      const siW   = siBtn.offsetWidth;
-      const gap   = 16;
-
-      // Shift SI left so both buttons look centered together
-      siBtn.style.marginLeft = `-${(siW + gap) / 2}px`;
-
-      // After layout updates, position NO right next to SI
-      requestAnimationFrame(() => {
-        const siRect   = siBtn.getBoundingClientRect();
-        const zoneRect = noZone.getBoundingClientRect();
-        const x = siRect.right - zoneRect.left + gap;
-        const y = siRect.top  - zoneRect.top;
-        btnNo.style.left = Math.min(Math.max(0, x), noZone.offsetWidth - siW) + 'px';
-        btnNo.style.top  = Math.max(0, y) + 'px';
-        btnNo.style.pointerEvents = 'all';
-        anime({ targets: btnNo, opacity: [0, 1], duration: 500, easing: 'easeOutExpo' });
-      });
-    }
+    let escaped  = false;
 
     function moveNo(e) {
       if (e) e.preventDefault();
+
+      if (!escaped) {
+        // Snap button to zone at exact current visual position
+        const rect     = btnNo.getBoundingClientRect();
+        const zoneRect = noZone.getBoundingClientRect();
+        btnNo.classList.add('escaped');
+        noZone.appendChild(btnNo);
+        btnNo.style.left = (rect.left - zoneRect.left) + 'px';
+        btnNo.style.top  = (rect.top  - zoneRect.top)  + 'px';
+        escaped = true;
+        setTimeout(doMove, 80);
+      } else {
+        doMove();
+      }
+    }
+
+    function doMove() {
       const zw = noZone.offsetWidth;
       const zh = noZone.offsetHeight;
-      // Random position guaranteed inside the zone
-      const x = Math.random() * (zw - BTN_W);
-      const y = Math.random() * (zh - BTN_H);
+      const bw = btnNo.offsetWidth  || 220;
+      const bh = btnNo.offsetHeight || 60;
+      const x  = Math.random() * Math.max(0, zw - bw);
+      const y  = Math.random() * Math.max(0, zh - bh);
       anime({ targets: btnNo, left: x + 'px', top: y + 'px', duration: 200, easing: 'easeOutQuad' });
     }
 
