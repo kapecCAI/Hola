@@ -96,8 +96,16 @@
       margin-top: 28px;
     }
 
-    /* NO button — starts inline, escapes on hover */
+    /* Zone where NO roams — browser enforces containment */
+    #no-zone {
+      position: fixed;
+      inset: 20px;
+      pointer-events: none;
+      z-index: 200;
+    }
+
     #btnNo {
+      position: absolute;
       padding: 18px 64px;
       font-size: clamp(1.2rem, 4vw, 2rem);
       font-weight: 700;
@@ -106,14 +114,11 @@
       border: none;
       border-radius: 60px;
       cursor: pointer;
+      opacity: 0;
+      pointer-events: none;
       user-select: none;
       -webkit-user-select: none;
       box-shadow: 0 4px 20px #c4614a44;
-    }
-
-    #btnNo.escaped {
-      position: fixed;
-      z-index: 200;
     }
 
     /* YES overlay */
@@ -196,11 +201,13 @@
     <div class="cta-card" id="ctaCard">
       <p class="date-text">Este viernes 30 de mayo<br>a las 18hs</p>
       <p class="note">(la fecha la podemos mover, no drama)</p>
-      <div class="btn-container">
-        <button class="btn-si" onclick="handleSi()">Sí ✅</button>
-        <button id="btnNo">No ❌</button>
-      </div>
+      <button class="btn-si" onclick="handleSi()">Sí ✅</button>
     </div>
+  </div>
+
+  <!-- NO zone — button roams inside here, can't escape -->
+  <div id="no-zone">
+    <button id="btnNo">No ❌</button>
   </div>
 
   <!-- YES overlay -->
@@ -234,7 +241,7 @@
 
     revealIds.forEach(id => revealObserver.observe(document.getElementById(id)));
 
-    // CTA card
+    // CTA card + show NO button when slide is reached
     const ctaObserver = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (!entry.isIntersecting) return;
@@ -243,7 +250,8 @@
           opacity: [0, 1],
           translateY: [50, 0],
           duration: 750,
-          easing: 'easeOutExpo'
+          easing: 'easeOutExpo',
+          complete: showNo
         });
         ctaObserver.unobserve(entry.target);
       });
@@ -265,50 +273,34 @@
       });
     }
 
-    // ── NO button ──────────────────────────────────────────────────
-    const btnNo = document.getElementById('btnNo');
-    let escaped = false;
+    // ── NO button — lives inside #no-zone, can never escape it ─────
+    const btnNo  = document.getElementById('btnNo');
+    const noZone = document.getElementById('no-zone');
+    const BTN_W  = 250;
+    const BTN_H  = 72;
 
-    // Conservative button size — never measure at runtime
-    const BTN_W = 250;
-    const BTN_H = 72;
-    const PAD   = 20;
-
-    function escapeNo(e) {
-      e.preventDefault();
-      if (!escaped) {
-        const rect = btnNo.getBoundingClientRect();
-        // Set transform to current position BEFORE switching to fixed so there's no jump
-        btnNo.style.transform = `translate(${rect.left}px, ${rect.top}px)`;
-        btnNo.classList.add('escaped');   // position: fixed kicks in
-        btnNo.style.left  = '0px';
-        btnNo.style.top   = '0px';
-        btnNo.style.width = BTN_W + 'px';
-        escaped = true;
-        setTimeout(moveNo, 80);
-      } else {
-        moveNo();
-      }
+    function showNo() {
+      const zw = noZone.offsetWidth;
+      const zh = noZone.offsetHeight;
+      // Start near bottom-right, close to where the SI button is
+      btnNo.style.left = Math.max(0, zw - BTN_W - 8) + 'px';
+      btnNo.style.top  = Math.min(zh * 0.65, zh - BTN_H - 8) + 'px';
+      btnNo.style.pointerEvents = 'all';
+      anime({ targets: btnNo, opacity: [0, 1], duration: 500, easing: 'easeOutExpo' });
     }
 
-    function moveNo() {
-      const vw = document.documentElement.clientWidth;
-      const vh = document.documentElement.clientHeight;
-
-      const x = PAD + Math.random() * (vw - BTN_W - PAD * 2);
-      const y = PAD + Math.random() * (vh - BTN_H - PAD * 2);
-
-      anime({
-        targets: btnNo,
-        translateX: x,
-        translateY: y,
-        duration: 200,
-        easing: 'easeOutQuad'
-      });
+    function moveNo(e) {
+      if (e) e.preventDefault();
+      const zw = noZone.offsetWidth;
+      const zh = noZone.offsetHeight;
+      // Random position guaranteed inside the zone
+      const x = Math.random() * (zw - BTN_W);
+      const y = Math.random() * (zh - BTN_H);
+      anime({ targets: btnNo, left: x + 'px', top: y + 'px', duration: 200, easing: 'easeOutQuad' });
     }
 
-    btnNo.addEventListener('mouseover', escapeNo);
-    btnNo.addEventListener('touchstart', escapeNo, { passive: false });
+    btnNo.addEventListener('mouseover', moveNo);
+    btnNo.addEventListener('touchstart', moveNo, { passive: false });
 
     // ── YES handler ────────────────────────────────────────────────
     function handleSi() {
