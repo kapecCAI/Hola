@@ -280,15 +280,24 @@
     const BTN_H  = 72;
 
     function showNo() {
-      // Place NO right next to the SI button
-      const siRect  = document.querySelector('.btn-si').getBoundingClientRect();
-      const zoneRect = noZone.getBoundingClientRect();
-      const x = Math.min(siRect.right - zoneRect.left + 16, noZone.offsetWidth - BTN_W);
-      const y = siRect.top - zoneRect.top + (siRect.height - BTN_H) / 2;
-      btnNo.style.left = Math.max(0, x) + 'px';
-      btnNo.style.top  = Math.max(0, y) + 'px';
-      btnNo.style.pointerEvents = 'all';
-      anime({ targets: btnNo, opacity: [0, 1], duration: 500, easing: 'easeOutExpo' });
+      const siBtn = document.querySelector('.btn-si');
+      const siW   = siBtn.offsetWidth;
+      const gap   = 16;
+
+      // Shift SI left so both buttons look centered together
+      siBtn.style.marginLeft = `-${(siW + gap) / 2}px`;
+
+      // After layout updates, position NO right next to SI
+      requestAnimationFrame(() => {
+        const siRect   = siBtn.getBoundingClientRect();
+        const zoneRect = noZone.getBoundingClientRect();
+        const x = siRect.right - zoneRect.left + gap;
+        const y = siRect.top  - zoneRect.top;
+        btnNo.style.left = Math.min(Math.max(0, x), noZone.offsetWidth - siW) + 'px';
+        btnNo.style.top  = Math.max(0, y) + 'px';
+        btnNo.style.pointerEvents = 'all';
+        anime({ targets: btnNo, opacity: [0, 1], duration: 500, easing: 'easeOutExpo' });
+      });
     }
 
     function moveNo(e) {
