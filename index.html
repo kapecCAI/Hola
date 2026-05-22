@@ -280,11 +280,13 @@
     const BTN_H  = 72;
 
     function showNo() {
-      const zw = noZone.offsetWidth;
-      const zh = noZone.offsetHeight;
-      // Start near bottom-right, close to where the SI button is
-      btnNo.style.left = Math.max(0, zw - BTN_W - 8) + 'px';
-      btnNo.style.top  = Math.min(zh * 0.65, zh - BTN_H - 8) + 'px';
+      // Place NO right next to the SI button
+      const siRect  = document.querySelector('.btn-si').getBoundingClientRect();
+      const zoneRect = noZone.getBoundingClientRect();
+      const x = Math.min(siRect.right - zoneRect.left + 16, noZone.offsetWidth - BTN_W);
+      const y = siRect.top - zoneRect.top + (siRect.height - BTN_H) / 2;
+      btnNo.style.left = Math.max(0, x) + 'px';
+      btnNo.style.top  = Math.max(0, y) + 'px';
       btnNo.style.pointerEvents = 'all';
       anime({ targets: btnNo, opacity: [0, 1], duration: 500, easing: 'easeOutExpo' });
     }
