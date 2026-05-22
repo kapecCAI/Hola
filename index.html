@@ -269,18 +269,20 @@
     const btnNo = document.getElementById('btnNo');
     let escaped = false;
 
-    // Fixed box the button roams within (generous button size so it never clips)
+    // Conservative button size — never measure at runtime
     const BTN_W = 250;
     const BTN_H = 72;
-    const PAD   = 16;
+    const PAD   = 20;
 
     function escapeNo(e) {
       e.preventDefault();
       if (!escaped) {
         const rect = btnNo.getBoundingClientRect();
-        btnNo.classList.add('escaped');
-        btnNo.style.left  = rect.left + 'px';
-        btnNo.style.top   = rect.top  + 'px';
+        // Set transform to current position BEFORE switching to fixed so there's no jump
+        btnNo.style.transform = `translate(${rect.left}px, ${rect.top}px)`;
+        btnNo.classList.add('escaped');   // position: fixed kicks in
+        btnNo.style.left  = '0px';
+        btnNo.style.top   = '0px';
         btnNo.style.width = BTN_W + 'px';
         escaped = true;
         setTimeout(moveNo, 80);
@@ -293,16 +295,13 @@
       const vw = document.documentElement.clientWidth;
       const vh = document.documentElement.clientHeight;
 
-      const maxX = Math.max(PAD, vw - BTN_W - PAD);
-      const maxY = Math.max(PAD, vh - BTN_H - PAD);
-
-      const x = PAD + Math.random() * (maxX - PAD);
-      const y = PAD + Math.random() * (maxY - PAD);
+      const x = PAD + Math.random() * (vw - BTN_W - PAD * 2);
+      const y = PAD + Math.random() * (vh - BTN_H - PAD * 2);
 
       anime({
         targets: btnNo,
-        left: x + 'px',
-        top:  y + 'px',
+        translateX: x,
+        translateY: y,
         duration: 200,
         easing: 'easeOutQuad'
       });
