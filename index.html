@@ -268,34 +268,34 @@
     // ── NO button ──────────────────────────────────────────────────
     const btnNo = document.getElementById('btnNo');
     let escaped = false;
-    let btnW = 0, btnH = 0;
 
     function escapeNo(e) {
       e.preventDefault();
       if (!escaped) {
         const rect = btnNo.getBoundingClientRect();
-        btnW = rect.width;
-        btnH = rect.height;
         btnNo.classList.add('escaped');
-        btnNo.style.left  = rect.left + 'px';
-        btnNo.style.top   = rect.top  + 'px';
-        btnNo.style.width = btnW + 'px';
+        btnNo.style.left = rect.left + 'px';
+        btnNo.style.top  = rect.top  + 'px';
         escaped = true;
-        setTimeout(moveNo, 80);
+        // Wait for reflow so offsetWidth is accurate, then lock width and move
+        requestAnimationFrame(() => {
+          btnNo.style.width = btnNo.offsetWidth + 'px';
+          setTimeout(moveNo, 80);
+        });
       } else {
         moveNo();
       }
     }
 
     function moveNo() {
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
-      const bw = btnW || btnNo.offsetWidth || 180;
-      const bh = btnH || btnNo.offsetHeight || 60;
-      const margin = 24;
+      const vw = document.documentElement.clientWidth;
+      const vh = document.documentElement.clientHeight;
+      const bw = btnNo.offsetWidth;
+      const bh = btnNo.offsetHeight;
+      const pad = 20;
 
-      const x = margin + Math.random() * Math.max(0, vw - bw - margin * 2);
-      const y = margin + Math.random() * Math.max(0, vh - bh - margin * 2);
+      const x = pad + Math.random() * Math.max(0, vw - bw - pad * 2);
+      const y = pad + Math.random() * Math.max(0, vh - bh - pad * 2);
 
       anime({
         targets: btnNo,
