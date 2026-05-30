@@ -282,20 +282,30 @@
     </div>
   </div>
 
-  <script src="https://www.youtube.com/iframe_api"></script>
   <script>
+    // Load YouTube API async so it doesn't block page render
+    (function() {
+      var tag = document.createElement('script');
+      tag.src = 'https://www.youtube.com/iframe_api';
+      tag.async = true;
+      document.head.appendChild(tag);
+    })();
     // ── YouTube API players ────────────────────────────────────────
     let musicPlayer = null;
     let surfPlayer = null;
     let musicStarted = false;
     let ytReady = false;
 
+    let pendingMusic = false;
+
     function onYouTubeIframeAPIReady() {
       ytReady = true;
+      if (pendingMusic) startMusic();
     }
 
     function startMusic() {
-      if (musicStarted || !ytReady) return;
+      if (musicStarted) return;
+      if (!ytReady) { pendingMusic = true; return; }
       musicStarted = true;
       musicPlayer = new YT.Player('bgMusicContainer', {
         height: '1', width: '1',
