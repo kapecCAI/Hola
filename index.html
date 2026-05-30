@@ -272,25 +272,37 @@
   </div>
 
   <!-- Hidden music player -->
-  <iframe id="bgMusic" style="display:none" allow="autoplay"></iframe>
+  <div id="bgMusicContainer" style="position:fixed;top:-200px;left:-200px;width:1px;height:1px;overflow:hidden"></div>
 
   <!-- Video fullscreen overlay -->
   <div id="videoOverlay">
     <p id="videoMsg">Te dejo un video por si estás aburrida</p>
     <div id="videoContainer">
-      <iframe id="surfVideo" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      <div id="surfVideoPlayer"></div>
     </div>
   </div>
 
+  <script src="https://www.youtube.com/iframe_api"></script>
   <script>
-    // ── Background music ────────────────────────────────────────────
+    // ── YouTube API players ────────────────────────────────────────
+    let musicPlayer = null;
+    let surfPlayer = null;
     let musicStarted = false;
-    const bgMusic = document.getElementById('bgMusic');
+    let ytReady = false;
+
+    function onYouTubeIframeAPIReady() {
+      ytReady = true;
+    }
 
     function startMusic() {
-      if (musicStarted) return;
+      if (musicStarted || !ytReady) return;
       musicStarted = true;
-      bgMusic.src = 'https://www.youtube.com/embed/yP4qdefD2To?autoplay=1&loop=1&playlist=yP4qdefD2To&controls=0';
+      musicPlayer = new YT.Player('bgMusicContainer', {
+        height: '1', width: '1',
+        videoId: 'yP4qdefD2To',
+        playerVars: { autoplay: 1, loop: 1, playlist: 'yP4qdefD2To', controls: 0 },
+        events: { onReady: function(e) { e.target.setVolume(50); e.target.playVideo(); } }
+      });
       window.removeEventListener('scroll', startMusic);
       window.removeEventListener('touchstart', startMusic);
       window.removeEventListener('click', startMusic);
@@ -300,8 +312,36 @@
     window.addEventListener('touchstart', startMusic, { once: true });
     window.addEventListener('click', startMusic, { once: true });
 
-    function stopMusic() {
-      bgMusic.src = '';
+    function crossfadeToVideo() {
+      // Start surf video muted at volume 0, then fade
+      surfPlayer = new YT.Player('surfVideoPlayer', {
+        width: '100%', height: '100%',
+        videoId: 'pNiT3S1-IDQ',
+        playerVars: { autoplay: 1, controls: 1 },
+        events: {
+          onReady: function(e) {
+            e.target.setVolume(0);
+            e.target.playVideo();
+            // Crossfade over 2 seconds
+            let step = 0;
+            const totalSteps = 40;
+            const interval = setInterval(() => {
+              step++;
+              const progress = step / totalSteps;
+              // Fade music out
+              if (musicPlayer && musicPlayer.setVolume) {
+                musicPlayer.setVolume(Math.max(0, 50 * (1 - progress)));
+              }
+              // Fade video in
+              e.target.setVolume(Math.min(100, 100 * progress));
+              if (step >= totalSteps) {
+                clearInterval(interval);
+                if (musicPlayer && musicPlayer.stopVideo) musicPlayer.stopVideo();
+              }
+            }, 50);
+          }
+        }
+      });
     }
 
     // ── Scroll reveal ──────────────────────────────────────────────
@@ -415,9 +455,8 @@
           setTimeout(() => {
             document.getElementById('videoMsg').style.opacity = '0';
             setTimeout(() => {
-              stopMusic();
-              document.getElementById('surfVideo').src = 'https://www.youtube.com/embed/pNiT3S1-IDQ?autoplay=1';
               document.getElementById('videoContainer').classList.add('active');
+              crossfadeToVideo();
             }, 800);
           }, 2500);
         }, 600);
