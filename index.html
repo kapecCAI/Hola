@@ -271,6 +271,9 @@
     </div>
   </div>
 
+  <!-- Hidden music player -->
+  <iframe id="bgMusic" style="display:none" allow="autoplay"></iframe>
+
   <!-- Video fullscreen overlay -->
   <div id="videoOverlay">
     <p id="videoMsg">Te dejo un video por si estás aburrida 🏄</p>
@@ -280,6 +283,27 @@
   </div>
 
   <script>
+    // ── Background music ────────────────────────────────────────────
+    let musicStarted = false;
+    const bgMusic = document.getElementById('bgMusic');
+
+    function startMusic() {
+      if (musicStarted) return;
+      musicStarted = true;
+      bgMusic.src = 'https://www.youtube.com/embed/yP4qdefD2To?autoplay=1&loop=1&playlist=yP4qdefD2To&controls=0';
+      window.removeEventListener('scroll', startMusic);
+      window.removeEventListener('touchstart', startMusic);
+      window.removeEventListener('click', startMusic);
+    }
+
+    window.addEventListener('scroll', startMusic, { once: true });
+    window.addEventListener('touchstart', startMusic, { once: true });
+    window.addEventListener('click', startMusic, { once: true });
+
+    function stopMusic() {
+      bgMusic.src = '';
+    }
+
     // ── Scroll reveal ──────────────────────────────────────────────
     const revealIds = ['m1', 'm2', 'm3', 'm4', 'm5', 'm6', 'm7'];
 
@@ -391,6 +415,7 @@
           setTimeout(() => {
             document.getElementById('videoMsg').style.opacity = '0';
             setTimeout(() => {
+              stopMusic();
               document.getElementById('surfVideo').src = 'https://www.youtube.com/embed/hHOhBRGf_FM?autoplay=1&start=3';
               document.getElementById('videoContainer').classList.add('active');
             }, 800);
